@@ -1,16 +1,29 @@
+import { useState } from 'react'
+import HowItWorks from './HowItWorks'
+import LivePriceAlerts from './LivePriceAlerts'
+
 function App() {
-  return (
+  const [currentPage, setCurrentPage] = useState('home')
+
+  const renderPage = () => {
+    switch(currentPage) {
+      case 'how-it-works':
+        return <HowItWorks onNavigate={setCurrentPage} />
+      case 'live-price-alerts':
+        return <LivePriceAlerts onNavigate={setCurrentPage} />
+      default:
+        return (
     <div className="min-h-screen bg-white">
       {/* Header */}
       <header className="bg-white border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
             <div className="flex items-center">
-              <h1 className="text-2xl font-serif font-bold text-gray-900">GoingGone</h1>
+              <button onClick={() => setCurrentPage('home')} className="text-2xl font-serif font-bold text-gray-900 hover:text-gray-700 transition-colors">GoingGone</button>
             </div>
             <nav className="hidden md:flex space-x-8">
-              <a href="#how-it-works" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors uppercase tracking-wide">How it Works</a>
-              <a href="#price-alerts" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors uppercase tracking-wide">Live Price Alerts</a>
+              <button onClick={() => setCurrentPage('how-it-works')} className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors uppercase tracking-wide">How it Works</button>
+              <button onClick={() => setCurrentPage('live-price-alerts')} className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors uppercase tracking-wide">Live Price Alerts</button>
               <a href="#signup" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors uppercase tracking-wide">Sign Up</a>
             </nav>
             <div className="flex items-center">
@@ -149,7 +162,11 @@ function App() {
         </div>
       </section>
     </div>
-  )
+        )
+    }
+  }
+
+  return renderPage()
 }
 
 export default App
