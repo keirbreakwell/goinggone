@@ -1,83 +1,103 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 function LivePriceAlerts({ onNavigate }) {
   const [activeFilter, setActiveFilter] = useState('All');
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [lastUpdated, setLastUpdated] = useState(null);
   
-  // Mock data for product alerts
-  const productAlerts = [
-    {
-      id: 1,
-      name: "Nike Air Max 270",
-      originalPrice: 150,
-      discountedPrice: 89,
-      discount: 41,
-      image: "nike-shoes",
-      brand: "Nike",
-      category: "Shoes",
-      gender: "Men's"
-    },
-    {
-      id: 2,
-      name: "Levi's 501 Original Jeans",
-      originalPrice: 98,
-      discountedPrice: 59,
-      discount: 40,
-      image: "jeans",
-      brand: "Levi's",
-      category: "Clothing",
-      gender: "Men's"
-    },
-    {
-      id: 3,
-      name: "Adidas Ultraboost 22",
-      originalPrice: 180,
-      discountedPrice: 108,
-      discount: 40,
-      image: "adidas-shoes",
-      brand: "Adidas",
-      category: "Shoes",
-      gender: "Women's"
-    },
-    {
-      id: 4,
-      name: "Nike Kids Air Max 270",
-      originalPrice: 80,
-      discountedPrice: 45,
-      discount: 44,
-      image: "kids-nike-shoes",
-      brand: "Nike",
-      category: "Shoes",
-      gender: "Children's"
-    },
-    {
-      id: 5,
-      name: "Adidas Kids Ultraboost 22",
-      originalPrice: 90,
-      discountedPrice: 54,
-      discount: 40,
-      image: "kids-adidas-shoes",
-      brand: "Adidas",
-      category: "Shoes",
-      gender: "Children's"
+  // Fetch products from API
+  const fetchProducts = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const response = await fetch('http://localhost:3001/api/products?limit=100');
+      
+      if (!response.ok) {
+        throw new Error(`Failed to fetch products: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      setProducts(data);
+      setLastUpdated(new Date());
+      
+    } catch (err) {
+      console.error('Error fetching products:', err);
+      setError(err.message);
+      
+      // Fallback to mock data if API fails
+      setProducts([
+        {
+          id: 1,
+          name: "Nike Air Max 270",
+          price: 89,
+          discount: 41,
+          imageUrl: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=400&fit=crop&crop=center",
+          brand: "Nike",
+          retailer: "Nike Store"
+        },
+        {
+          id: 2,
+          name: "Levi's 501 Original Jeans",
+          price: 59,
+          discount: 40,
+          imageUrl: "https://images.unsplash.com/photo-1542272604-787c3835535d?w=400&h=400&fit=crop&crop=center",
+          brand: "Levi's",
+          retailer: "Levi's Store"
+        },
+        {
+          id: 3,
+          name: "Adidas Ultraboost 22",
+          price: 108,
+          discount: 40,
+          imageUrl: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=400&fit=crop&crop=center",
+          brand: "Adidas",
+          retailer: "Adidas Store"
+        }
+      ]);
+    } finally {
+      setLoading(false);
     }
-  ]
+  };
 
-  // Filter products based on active filter
-  const filteredProducts = activeFilter === 'All' 
-    ? productAlerts 
-    : productAlerts.filter(product => product.gender === activeFilter);
-
-  // Function to generate product images
-  const getProductImage = (product) => {
-    const imageMap = {
-      'nike-shoes': 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=400&fit=crop&crop=center',
-      'jeans': 'https://images.unsplash.com/photo-1542272604-787c3835535d?w=400&h=400&fit=crop&crop=center',
-      'adidas-shoes': 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=400&fit=crop&crop=center',
-      'kids-nike-shoes': 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=400&fit=crop&crop=center',
-      'kids-adidas-shoes': 'https://images.unsplash.com/photo-1549298916-b41d501d3772?w=400&h=400&fit=crop&crop=center'
-    };
+  // Fetch products on component mount
+  useEffect(() => {
+    fetchProducts();
     
-    return imageMap[product.image] || 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&h=400&fit=crop&crop=center';
+    // Set up auto-refresh every 5 minutes
+    const interval = setInterval(fetchProducts, 5 * 60 * 1000);
+    
+    return () => clearInterval(interval);
+  }, []);
+
+  // Filter products based on active filter (simplified for now - can be enhanced later)
+  const filteredProducts = activeFilter === 'All' 
+    ? products 
+    : products.filter(product => product.brand.toLowerCase().includes(activeFilter.toLowerCase()));
+
+  // Calculate original price from discount percentage
+  const calculateOriginalPrice = (currentPrice, discountPercent) => {
+    if (discountPercent <= 0) return currentPrice;
+    return Math.round(currentPrice / (1 - discountPercent / 100));
+  };
+
+  // Format last updated time
+  const formatLastUpdated = (date) => {
+    if (!date) return '';
+    const now = new Date();
+    const diffInMinutes = Math.floor((now - date) / (1000 * 60));
+    
+    if (diffInMinutes < 1) return 'Just now';
+    if (diffInMinutes === 1) return '1 minute ago';
+    if (diffInMinutes < 60) return `${diffInMinutes} minutes ago`;
+    
+    const diffInHours = Math.floor(diffInMinutes / 60);
+    if (diffInHours === 1) return '1 hour ago';
+    if (diffInHours < 24) return `${diffInHours} hours ago`;
+    
+    return date.toLocaleDateString();
   };
 
   return (
@@ -108,17 +128,27 @@ function LivePriceAlerts({ onNavigate }) {
             Live Price Alerts
           </h1>
           <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-            Real-time deals and discounts from your favourite brands. Never miss out on the best prices again.
+            Real-time deals and discounts from your favourite brands. Only showing products with 50%+ discounts.
           </p>
           <div className="flex items-center justify-center space-x-8 text-sm text-gray-500">
             <div className="flex items-center">
-              <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
-              <span>Live Updates</span>
+              <div className={`w-2 h-2 rounded-full mr-2 ${loading ? 'bg-yellow-500 animate-pulse' : 'bg-green-500'}`}></div>
+              <span>{loading ? 'Loading...' : 'Live Updates'}</span>
             </div>
             <div className="flex items-center">
               <div className="w-2 h-2 bg-blue-500 rounded-full mr-2"></div>
               <span>{filteredProducts.length} Active Alerts</span>
             </div>
+            <div className="flex items-center">
+              <div className="w-2 h-2 bg-red-500 rounded-full mr-2"></div>
+              <span>50%+ Discounts Only</span>
+            </div>
+            {lastUpdated && (
+              <div className="flex items-center">
+                <div className="w-2 h-2 bg-gray-400 rounded-full mr-2"></div>
+                <span>Updated {formatLastUpdated(lastUpdated)}</span>
+              </div>
+            )}
           </div>
         </div>
       </section>
@@ -137,46 +167,20 @@ function LivePriceAlerts({ onNavigate }) {
             >
               All Products
             </button>
-            <button
-              onClick={() => setActiveFilter("Men's")}
-              className={`px-6 py-3 rounded-full text-sm font-medium transition-colors ${
-                activeFilter === "Men's"
-                  ? 'bg-gray-900 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-            >
-              Men's
-            </button>
-            <button
-              onClick={() => setActiveFilter("Women's")}
-              className={`px-6 py-3 rounded-full text-sm font-medium transition-colors ${
-                activeFilter === "Women's"
-                  ? 'bg-gray-900 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-            >
-              Women's
-            </button>
-            <button
-              onClick={() => setActiveFilter("Children's")}
-              className={`px-6 py-3 rounded-full text-sm font-medium transition-colors ${
-                activeFilter === "Children's"
-                  ? 'bg-gray-900 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-            >
-              Children's
-            </button>
-            <button
-              onClick={() => setActiveFilter("Unisex")}
-              className={`px-6 py-3 rounded-full text-sm font-medium transition-colors ${
-                activeFilter === "Unisex"
-                  ? 'bg-gray-900 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-            >
-              Unisex
-            </button>
+            {/* Dynamic brand filters based on available products */}
+            {Array.from(new Set(products.map(p => p.brand))).slice(0, 5).map(brand => (
+              <button
+                key={brand}
+                onClick={() => setActiveFilter(brand)}
+                className={`px-6 py-3 rounded-full text-sm font-medium transition-colors ${
+                  activeFilter === brand
+                    ? 'bg-gray-900 text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                {brand}
+              </button>
+            ))}
           </div>
         </div>
       </section>
@@ -184,7 +188,33 @@ function LivePriceAlerts({ onNavigate }) {
       {/* Product Alerts Grid */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          {filteredProducts.length === 0 ? (
+          {loading ? (
+            <div className="text-center py-16">
+              <div className="w-24 h-24 bg-gray-100 rounded-full mx-auto mb-4 flex items-center justify-center">
+                <svg className="w-12 h-12 text-gray-400 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">Loading products...</h3>
+              <p className="text-gray-600">Fetching the latest deals for you.</p>
+            </div>
+          ) : error ? (
+            <div className="text-center py-16">
+              <div className="w-24 h-24 bg-red-100 rounded-full mx-auto mb-4 flex items-center justify-center">
+                <svg className="w-12 h-12 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">Error loading products</h3>
+              <p className="text-gray-600 mb-4">{error}</p>
+              <button 
+                onClick={fetchProducts}
+                className="bg-gray-900 hover:bg-gray-800 text-white font-medium py-2 px-4 rounded transition-colors"
+              >
+                Try Again
+              </button>
+            </div>
+          ) : filteredProducts.length === 0 ? (
             <div className="text-center py-16">
               <div className="w-24 h-24 bg-gray-100 rounded-full mx-auto mb-4 flex items-center justify-center">
                 <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -196,45 +226,64 @@ function LivePriceAlerts({ onNavigate }) {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {filteredProducts.map((product) => (
-                <div key={product.id} className="bg-white border border-gray-200 hover:shadow-lg transition-shadow duration-300">
-                  <div className="p-6">
-                    {/* Product Image */}
-                    <div className="h-64 mb-6 overflow-hidden rounded-lg">
-                      <img 
-                        src={getProductImage(product)} 
-                        alt={product.name}
-                        className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                      />
-                    </div>
-
-                    {/* Product Info */}
-                    <div className="mb-4">
-                      <div className="text-sm text-gray-500 mb-1">{product.brand} • {product.category} • {product.gender}</div>
-                      <h3 className="text-lg font-semibold text-gray-900 mb-2">{product.name}</h3>
-                    </div>
-
-                    {/* Pricing */}
-                    <div className="mb-6">
-                      <div className="flex items-center space-x-3 mb-2">
-                        <span className="text-2xl font-bold text-gray-900">£{product.discountedPrice}</span>
-                        <span className="text-lg text-gray-500 line-through">£{product.originalPrice}</span>
-                        <span className="bg-red-100 text-red-800 text-sm font-medium px-2 py-1 rounded">
-                          {product.discount}% OFF
-                        </span>
+              {filteredProducts.map((product) => {
+                const originalPrice = calculateOriginalPrice(product.price, product.discount);
+                const savings = originalPrice - product.price;
+                
+                return (
+                  <div key={product.id} className="bg-white border border-gray-200 hover:shadow-lg transition-shadow duration-300">
+                    <div className="p-6">
+                      {/* Product Image */}
+                      <div className="h-64 mb-6 overflow-hidden rounded-lg">
+                        <img 
+                          src={product.imageUrl || 'https://via.placeholder.com/300x300?text=No+Image'} 
+                          alt={product.name}
+                          className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                          onError={(e) => {
+                            e.target.src = 'https://via.placeholder.com/300x300?text=No+Image';
+                          }}
+                        />
                       </div>
-                      <div className="text-sm text-green-600 font-medium">
-                        You save £{product.originalPrice - product.discountedPrice}
-                      </div>
-                    </div>
 
-                    {/* Shop Now Button */}
-                    <button className="w-full bg-gray-900 hover:bg-gray-800 text-white font-medium py-3 px-4 transition-colors">
-                      Shop Now
-                    </button>
+                      {/* Product Info */}
+                      <div className="mb-4">
+                        <div className="text-sm text-gray-500 mb-1">{product.brand} • {product.retailer}</div>
+                        <h3 className="text-lg font-semibold text-gray-900 mb-2">{product.name}</h3>
+                      </div>
+
+                      {/* Pricing */}
+                      <div className="mb-6">
+                        <div className="flex items-center space-x-3 mb-2">
+                          <span className="text-2xl font-bold text-gray-900">£{product.price.toFixed(2)}</span>
+                          {product.discount > 0 && (
+                            <>
+                              <span className="text-lg text-gray-500 line-through">£{originalPrice.toFixed(2)}</span>
+                              <span className="bg-red-100 text-red-800 text-sm font-medium px-2 py-1 rounded">
+                                {product.discount.toFixed(0)}% OFF
+                              </span>
+                            </>
+                          )}
+                        </div>
+                        {product.discount > 0 && (
+                          <div className="text-sm text-green-600 font-medium">
+                            You save £{savings.toFixed(2)}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Shop Now Button */}
+                      <a 
+                        href={product.url || '#'} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="w-full bg-gray-900 hover:bg-gray-800 text-white font-medium py-3 px-4 transition-colors block text-center"
+                      >
+                        Shop Now
+                      </a>
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>

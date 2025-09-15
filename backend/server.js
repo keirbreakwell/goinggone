@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const { PrismaClient } = require('@prisma/client');
+const AwinService = require('./services/awinService');
 
 // Load environment variables
 dotenv.config();
@@ -9,6 +10,9 @@ dotenv.config();
 const app = express();
 const prisma = new PrismaClient();
 const PORT = process.env.PORT || 3001;
+
+// Initialize AWIN service
+const awinService = new AwinService();
 
 // Middleware
 app.use(cors({
@@ -145,15 +149,81 @@ app.get('/api/brands', async (req, res) => {
   }
 });
 
+// Get all products
+app.get('/api/products', async (req, res) => {
+  try {
+    const { limit = 50, offset = 0, brand } = req.query;
+    
+    let products;
+    if (brand) {
+      products = await awinService.getProductsByBrand(brand, parseInt(limit));
+    } else {
+      products = await awinService.getProducts(parseInt(limit), parseInt(offset));
+    }
+    
+    res.json(products);
+  } catch (error) {
+    console.error('Get products error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Get products by brand
+app.get('/api/products/brand/:brandName', async (req, res) => {
+  try {
+    const { brandName } = req.params;
+    const { limit = 50 } = req.query;
+    
+    const products = await awinService.getProductsByBrand(brandName, parseInt(limit));
+    res.json(products);
+  } catch (error) {
+    console.error('Get products by brand error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Manual trigger for product update
+app.post('/api/products/update', async (req, res) => {
+  try {
+    await awinService.updateProducts();
+    res.json({ message: 'Product update triggered successfully' });
+  } catch (error) {
+    console.error('Manual product update error:', error);
+    res.status(500).json({ error: 'Failed to update products' });
+  }
+});
+
+// Get discount statistics
+app.get('/api/products/stats', async (req, res) => {
+  try {
+    const stats = await awinService.getDiscountStats();
+    res.json(stats);
+  } catch (error) {
+    console.error('Get discount stats error:', error);
+    res.status(500).json({ error: 'Failed to get discount statistics' });
+  }
+});
+
 // Start server
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
   console.log(`📊 Health check: http://localhost:${PORT}/health`);
+  
+  // Start AWIN service for periodic product updates
+  awinService.startPeriodicUpdates();
 });
 
 // Graceful shutdown
 process.on('SIGINT', async () => {
+  console.log('\n🛑 Shutting down gracefully...');
+  
+  // Stop AWIN service
+  await awinService.cleanup();
+  
+  // Disconnect from database
   await prisma.$disconnect();
+  
+  console.log('✅ Shutdown complete');
   process.exit(0);
 });
 
