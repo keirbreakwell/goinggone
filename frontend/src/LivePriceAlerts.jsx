@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from 'react';
 
 function LivePriceAlerts({ onNavigate }) {
+  // 🚀 TOGGLE FOR LIVE DEPLOYMENT: Set showComingSoon to false when API is ready
   const [activeFilter, setActiveFilter] = useState('All');
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [lastUpdated, setLastUpdated] = useState(null);
+  
+  // Toggle for "COMING SOON" overlay - set to false when API is ready
+  const [showComingSoon, setShowComingSoon] = useState(true);
   
   // Fetch products from API
   const fetchProducts = async () => {
@@ -103,31 +107,55 @@ function LivePriceAlerts({ onNavigate }) {
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
-      <header className="absolute top-0 left-0 right-0 z-50 bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
+      <header className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100">
+        <div className="max-w-6xl mx-auto px-6 lg:px-8">
+          <div className="flex justify-between items-center py-4">
             <div className="flex items-center">
-              <button onClick={() => onNavigate('home')} className="text-2xl font-riccione font-thin text-gray-900 hover:text-gray-700 transition-colors tracking-wider">GoingGone</button>
+              <button onClick={() => onNavigate('home')} className="text-xl font-medium text-gray-900 hover:text-gray-600 transition-colors duration-200">GoingGone</button>
             </div>
             <nav className="hidden md:flex space-x-8">
-              <button onClick={() => onNavigate('how-it-works')} className="text-sm font-light text-gray-600 hover:text-gray-900 transition-colors uppercase tracking-wide hover:underline">How it Works</button>
-              <span className="text-sm font-light text-gray-900 transition-colors uppercase tracking-wide">Live Price Alerts</span>
-              <button onClick={() => onNavigate('sign-up')} className="text-sm font-light text-gray-600 hover:text-gray-900 transition-colors uppercase tracking-wide hover:underline">Sign Up</button>
+              <button onClick={() => onNavigate('how-it-works')} className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors duration-200">How it Works</button>
+              <span className="text-sm font-medium text-gray-900">Live Price Alerts</span>
+              <button onClick={() => onNavigate('sign-up')} className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors duration-200">Sign Up</button>
             </nav>
             <div className="flex items-center">
-              <a href="#account" className="text-sm font-light text-gray-600 hover:text-gray-900 transition-colors">Account</a>
+              <a href="#account" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors duration-200">Account</a>
             </div>
           </div>
         </div>
       </header>
 
+      {/* COMING SOON Overlay */}
+      {showComingSoon && (
+        <div className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm flex items-center justify-center">
+          <div className="bg-white rounded-2xl p-12 max-w-md mx-6 text-center shadow-2xl">
+            <div className="w-16 h-16 bg-gray-900 rounded-full flex items-center justify-center mx-auto mb-6">
+              <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <h2 className="text-3xl font-light text-gray-900 mb-4">Coming Soon</h2>
+            <p className="text-lg text-gray-600 mb-6">
+              We're currently setting up partnerships with retailers to bring you the best deals. 
+              Live price alerts will be available soon!
+            </p>
+            <button 
+              onClick={() => onNavigate('sign-up')} 
+              className="w-full bg-gray-900 hover:bg-gray-800 text-white font-medium py-3 px-6 transition-all duration-200 rounded-lg"
+            >
+              Join Waitlist
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Hero Section */}
-      <section className="pt-24 pb-16 bg-gradient-to-br from-gray-50 to-white">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 text-center">
-          <h1 className="text-5xl md:text-6xl font-riccione font-light text-gray-900 mb-6">
+      <section className="pt-24 pb-16 bg-white">
+        <div className="max-w-6xl mx-auto px-6 lg:px-8 text-center">
+          <h1 className="text-5xl lg:text-6xl font-light text-gray-900 mb-6">
             Live Price Alerts
           </h1>
-          <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
+          <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
             Real-time deals and discounts from your favourite brands. Only showing products with 50%+ discounts.
           </p>
           <div className="flex items-center justify-center space-x-8 text-sm text-gray-500">
@@ -154,15 +182,15 @@ function LivePriceAlerts({ onNavigate }) {
       </section>
 
       {/* Filter Buttons */}
-      <section className="py-8 bg-white border-b border-gray-100">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+      <section className="py-8 bg-gray-50 border-b border-gray-100">
+        <div className="max-w-6xl mx-auto px-6 lg:px-8">
           <div className="flex flex-wrap justify-center gap-4">
             <button
               onClick={() => setActiveFilter('All')}
-              className={`px-6 py-3 rounded-full text-sm font-medium transition-colors ${
+              className={`px-6 py-3 rounded-lg text-sm font-medium transition-all duration-200 ${
                 activeFilter === 'All'
-                  ? 'bg-gray-900 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  ? 'bg-gray-900 text-white hover:bg-gray-800'
+                  : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
               }`}
             >
               All Products
@@ -172,10 +200,10 @@ function LivePriceAlerts({ onNavigate }) {
               <button
                 key={brand}
                 onClick={() => setActiveFilter(brand)}
-                className={`px-6 py-3 rounded-full text-sm font-medium transition-colors ${
+                className={`px-6 py-3 rounded-lg text-sm font-medium transition-all duration-200 ${
                   activeFilter === brand
-                    ? 'bg-gray-900 text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    ? 'bg-gray-900 text-white hover:bg-gray-800'
+                    : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
                 }`}
               >
                 {brand}
@@ -187,7 +215,7 @@ function LivePriceAlerts({ onNavigate }) {
 
       {/* Product Alerts Grid */}
       <section className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+        <div className="max-w-6xl mx-auto px-6 lg:px-8">
           {loading ? (
             <div className="text-center py-16">
               <div className="w-24 h-24 bg-gray-100 rounded-full mx-auto mb-4 flex items-center justify-center">
@@ -231,7 +259,7 @@ function LivePriceAlerts({ onNavigate }) {
                 const savings = originalPrice - product.price;
                 
                 return (
-                  <div key={product.id} className="bg-white border border-gray-200 hover:shadow-lg transition-shadow duration-300">
+                  <div key={product.id} className="bg-white border border-gray-200 hover:shadow-lg transition-all duration-200 rounded-xl overflow-hidden">
                     <div className="p-6">
                       {/* Product Image */}
                       <div className="h-64 mb-6 overflow-hidden rounded-lg">
@@ -248,7 +276,7 @@ function LivePriceAlerts({ onNavigate }) {
                       {/* Product Info */}
                       <div className="mb-4">
                         <div className="text-sm text-gray-500 mb-1">{product.brand} • {product.retailer}</div>
-                        <h3 className="text-lg font-semibold text-gray-900 mb-2">{product.name}</h3>
+                        <h3 className="text-lg font-medium text-gray-900 mb-2">{product.name}</h3>
                       </div>
 
                       {/* Pricing */}
@@ -258,7 +286,7 @@ function LivePriceAlerts({ onNavigate }) {
                           {product.discount > 0 && (
                             <>
                               <span className="text-lg text-gray-500 line-through">£{originalPrice.toFixed(2)}</span>
-                              <span className="bg-red-100 text-red-800 text-sm font-medium px-2 py-1 rounded">
+                              <span className="bg-red-100 text-red-800 text-sm font-medium px-2 py-1 rounded-lg">
                                 {product.discount.toFixed(0)}% OFF
                               </span>
                             </>
@@ -276,7 +304,7 @@ function LivePriceAlerts({ onNavigate }) {
                         href={product.url || '#'} 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        className="w-full bg-gray-900 hover:bg-gray-800 text-white font-medium py-3 px-4 transition-colors block text-center"
+                        className="w-full bg-gray-900 hover:bg-gray-800 text-white font-medium py-3 px-4 transition-all duration-200 block text-center rounded-lg hover:shadow-lg"
                       >
                         Shop Now
                       </a>
@@ -290,19 +318,22 @@ function LivePriceAlerts({ onNavigate }) {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-32 bg-gray-50">
         <div className="max-w-4xl mx-auto px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-riccione font-bold text-gray-900 mb-4">
+          <h2 className="text-4xl lg:text-5xl font-light text-gray-900 mb-6">
             Want More Deals Like These?
           </h2>
-          <p className="text-lg text-gray-600 mb-8">
+          <p className="text-xl text-gray-600 mb-12 max-w-2xl mx-auto">
             Create custom alerts for your favourite brands and never miss a deal again.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="bg-gray-900 hover:bg-gray-800 text-white font-light py-3 px-6 transition-colors tracking-wide">
+            <button className="bg-gray-900 hover:bg-gray-800 text-white font-medium py-4 px-8 transition-all duration-200 text-lg rounded-lg hover:shadow-lg">
               Create Alert
             </button>
-            <button onClick={() => onNavigate('sign-up')} className="bg-white/80 backdrop-blur-sm hover:bg-white/90 text-gray-900 font-light py-3 px-6 transition-colors border border-gray-300 tracking-wide">
+            <button 
+              onClick={() => onNavigate('sign-up')} 
+              className="bg-white hover:bg-gray-50 text-gray-900 font-medium py-4 px-8 transition-all duration-200 text-lg border border-gray-300 rounded-lg hover:shadow-lg"
+            >
               Join Waitlist
             </button>
           </div>

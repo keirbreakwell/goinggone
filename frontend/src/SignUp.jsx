@@ -129,52 +129,52 @@ function SignUp({ onNavigate }) {
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
-      <header className="absolute top-0 left-0 right-0 z-50 bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
+      <header className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100">
+        <div className="max-w-6xl mx-auto px-6 lg:px-8">
+          <div className="flex justify-between items-center py-4">
             <div className="flex items-center">
-              <button onClick={() => onNavigate('home')} className="text-2xl font-riccione font-thin text-gray-900 hover:text-gray-700 transition-colors tracking-wider">GoingGone</button>
+              <button onClick={() => onNavigate('home')} className="text-xl font-medium text-gray-900 hover:text-gray-600 transition-colors duration-200">GoingGone</button>
             </div>
             <nav className="hidden md:flex space-x-8">
-              <button onClick={() => onNavigate('how-it-works')} className="text-sm font-light text-gray-600 hover:text-gray-900 transition-colors uppercase tracking-wide hover:underline">How it Works</button>
-              <button onClick={() => onNavigate('live-price-alerts')} className="text-sm font-light text-gray-600 hover:text-gray-900 transition-colors uppercase tracking-wide hover:underline">Live Price Alerts</button>
-              <span className="text-sm font-light text-gray-900 transition-colors uppercase tracking-wide">Sign Up</span>
+              <button onClick={() => onNavigate('how-it-works')} className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors duration-200">How it Works</button>
+              <button onClick={() => onNavigate('live-price-alerts')} className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors duration-200">Live Price Alerts</button>
+              <span className="text-sm font-medium text-gray-900">Sign Up</span>
             </nav>
             <div className="flex items-center">
-              <a href="#account" className="text-sm font-light text-gray-600 hover:text-gray-900 transition-colors">Account</a>
+              <a href="#account" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors duration-200">Account</a>
             </div>
           </div>
         </div>
       </header>
 
       {/* Hero Section */}
-      <section className="pt-24 pb-16 bg-gradient-to-br from-gray-50 to-white">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 text-center">
-          <h1 className="text-5xl md:text-6xl font-riccione font-light text-gray-900 mb-6">
+      <section className="pt-24 pb-16 bg-white">
+        <div className="max-w-6xl mx-auto px-6 lg:px-8 text-center">
+          <h1 className="text-5xl lg:text-6xl font-light text-gray-900 mb-6">
             Join the Waitlist
           </h1>
-          <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
+          <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
             Be the first to know about the best deals from your favourite brands. Never miss out again.
           </p>
         </div>
       </section>
 
       {/* Sign Up Form */}
-      <section className="py-20 bg-white">
+      <section className="py-32 bg-gray-50">
         <div className="max-w-4xl mx-auto px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-riccione font-bold text-gray-900 mb-4">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl lg:text-5xl font-light text-gray-900 mb-6">
               Get Started
             </h2>
-            <p className="text-lg text-gray-600">
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
               Tell us about yourself and your favourite brands
             </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-8">
             {/* Personal Information */}
-            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 border border-gray-200">
-              <h3 className="text-2xl font-riccione font-bold text-gray-900 mb-6">Personal Information</h3>
+            <div className="bg-white rounded-xl p-8 border border-gray-200">
+              <h3 className="text-2xl font-medium text-gray-900 mb-6">Personal Information</h3>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
@@ -188,7 +188,7 @@ function SignUp({ onNavigate }) {
                     value={formData.firstName}
                     onChange={handleInputChange}
                     required
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent transition-all duration-200"
                     placeholder="Enter your first name"
                   />
                 </div>
@@ -204,7 +204,7 @@ function SignUp({ onNavigate }) {
                     value={formData.lastName}
                     onChange={handleInputChange}
                     required
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent transition-all duration-200"
                     placeholder="Enter your last name"
                   />
                 </div>
@@ -221,15 +221,15 @@ function SignUp({ onNavigate }) {
                   value={formData.email}
                   onChange={handleInputChange}
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent transition-all duration-200"
                   placeholder="Enter your email address"
                 />
               </div>
             </div>
 
             {/* Brand Selection */}
-            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 border border-gray-200">
-              <h3 className="text-2xl font-riccione font-bold text-gray-900 mb-6">
+            <div className="bg-white rounded-xl p-8 border border-gray-200">
+              <h3 className="text-2xl font-medium text-gray-900 mb-6">
                 Favourite Brands
               </h3>
               <p className="text-gray-600 mb-6">
@@ -238,12 +238,12 @@ function SignUp({ onNavigate }) {
               
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-6">
                 {popularBrands.map((brand) => (
-                  <label key={brand} className="flex items-center space-x-3 cursor-pointer hover:bg-gray-50 p-3 rounded-lg transition-colors">
+                  <label key={brand} className="flex items-center space-x-3 cursor-pointer hover:bg-gray-50 p-3 rounded-lg transition-all duration-200">
                     <input
                       type="checkbox"
                       checked={formData.selectedBrands.includes(brand)}
                       onChange={() => handleBrandChange(brand)}
-                      className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                      className="w-4 h-4 text-gray-900 border-gray-300 rounded focus:ring-gray-900"
                     />
                     <span className="text-sm font-medium text-gray-700">{brand}</span>
                   </label>
@@ -260,7 +260,7 @@ function SignUp({ onNavigate }) {
                   name="otherBrand"
                   value={formData.otherBrand}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent transition-all duration-200"
                   placeholder="Enter other brands you're interested in (comma separated)"
                 />
                 <p className="text-sm text-gray-500 mt-2">
@@ -274,7 +274,7 @@ function SignUp({ onNavigate }) {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="bg-gray-900 hover:bg-gray-800 disabled:bg-gray-400 text-white font-light py-4 px-12 transition-colors text-lg rounded-full tracking-wide disabled:cursor-not-allowed"
+                className="bg-gray-900 hover:bg-gray-800 disabled:bg-gray-400 text-white font-medium py-4 px-12 transition-all duration-200 text-lg rounded-lg hover:shadow-lg disabled:cursor-not-allowed"
               >
                 {isSubmitting ? (
                   <div className="flex items-center space-x-2">
