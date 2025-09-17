@@ -3,9 +3,140 @@ import HowItWorks from './HowItWorks'
 import LivePriceAlerts from './LivePriceAlerts'
 import SignUp from './SignUp'
 
+// Burger Menu Component
+function BurgerMenu({ currentPage, onNavigate, isOpen, onToggle }) {
+  return (
+    <>
+      {/* Burger Button */}
+      <button
+        onClick={onToggle}
+        className="md:hidden flex flex-col justify-center items-center w-8 h-8 space-y-1.5 focus:outline-none"
+        aria-label="Toggle navigation menu"
+      >
+        <span className={`block w-6 h-0.5 bg-gray-900 transition-all duration-300 ${isOpen ? 'rotate-45 translate-y-2' : ''}`}></span>
+        <span className={`block w-6 h-0.5 bg-gray-900 transition-all duration-300 ${isOpen ? 'opacity-0' : ''}`}></span>
+        <span className={`block w-6 h-0.5 bg-gray-900 transition-all duration-300 ${isOpen ? '-rotate-45 -translate-y-2' : ''}`}></span>
+      </button>
+
+      {/* Mobile Menu Overlay */}
+      {isOpen && (
+        <div className="fixed inset-0 z-50 md:hidden">
+          {/* Backdrop */}
+          <div 
+            className="fixed inset-0 bg-black z-40"
+            onClick={onToggle}
+            style={{ backgroundColor: 'rgba(0, 0, 0, 0.8)' }}
+          ></div>
+          
+          {/* Menu Panel */}
+          <div 
+            className="fixed top-0 right-0 h-full w-72 max-w-[80vw] shadow-2xl transform transition-transform duration-300 ease-in-out z-50"
+            style={{ 
+              backgroundColor: 'white', 
+              opacity: 1,
+              borderLeft: '1px solid #e5e7eb'
+            }}
+          >
+            <div 
+              className="flex flex-col h-full"
+              style={{ backgroundColor: 'white' }}
+            >
+              {/* Header */}
+              <div 
+                className="flex items-center justify-between p-6 border-b border-gray-200"
+                style={{ backgroundColor: 'white' }}
+              >
+                <h2 className="text-xl font-medium text-gray-900">Menu</h2>
+                <button
+                  onClick={onToggle}
+                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  aria-label="Close menu"
+                >
+                  <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              {/* Navigation Links */}
+              <nav 
+                className="flex-1 p-6"
+                style={{ backgroundColor: 'white' }}
+              >
+                <div 
+                  className="space-y-1"
+                  style={{ backgroundColor: 'white' }}
+                >
+                  <button
+                    onClick={() => {
+                      onNavigate('home');
+                      onToggle();
+                    }}
+                    className={`w-full text-left px-4 py-3 rounded-lg text-lg font-medium transition-colors ${
+                      currentPage === 'home' 
+                        ? 'bg-gray-900 text-white' 
+                        : 'text-gray-900 hover:bg-gray-100'
+                    }`}
+                  >
+                    Home
+                  </button>
+                  
+                  <button
+                    onClick={() => {
+                      onNavigate('how-it-works');
+                      onToggle();
+                    }}
+                    className={`w-full text-left px-4 py-3 rounded-lg text-lg font-medium transition-colors ${
+                      currentPage === 'how-it-works' 
+                        ? 'bg-gray-900 text-white' 
+                        : 'text-gray-900 hover:bg-gray-100'
+                    }`}
+                  >
+                    How it Works
+                  </button>
+                  
+                  <button
+                    onClick={() => {
+                      onNavigate('live-price-alerts');
+                      onToggle();
+                    }}
+                    className={`w-full text-left px-4 py-3 rounded-lg text-lg font-medium transition-colors ${
+                      currentPage === 'live-price-alerts' 
+                        ? 'bg-gray-900 text-white' 
+                        : 'text-gray-900 hover:bg-gray-100'
+                    }`}
+                  >
+                    Live Price Alerts
+                  </button>
+                  
+                  <button
+                    onClick={() => {
+                      onNavigate('sign-up');
+                      onToggle();
+                    }}
+                    className={`w-full text-left px-4 py-3 rounded-lg text-lg font-medium transition-colors ${
+                      currentPage === 'sign-up' 
+                        ? 'bg-gray-900 text-white' 
+                        : 'text-gray-900 hover:bg-gray-100'
+                    }`}
+                  >
+                    Sign Up
+                  </button>
+                </div>
+              </nav>
+
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
 function App() {
   const [currentPage, setCurrentPage] = useState('home')
   const [visibleFeatures, setVisibleFeatures] = useState(new Set())
+  const [isBurgerMenuOpen, setIsBurgerMenuOpen] = useState(false)
 
   const features = [
     {
@@ -137,7 +268,12 @@ function App() {
               <button onClick={() => setCurrentPage('sign-up')} className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors duration-200">Sign Up</button>
             </nav>
             <div className="flex items-center">
-              <a href="#account" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors duration-200">Account</a>
+              <BurgerMenu 
+                currentPage={currentPage}
+                onNavigate={setCurrentPage}
+                isOpen={isBurgerMenuOpen}
+                onToggle={() => setIsBurgerMenuOpen(!isBurgerMenuOpen)}
+              />
             </div>
           </div>
         </div>
